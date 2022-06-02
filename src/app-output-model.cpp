@@ -192,7 +192,7 @@ void OutputModel::write(std::string_view path, std::string_view font_path, const
     fmt::print(f, "static const font2c_glyph_t GLYPHS[{}] = {{\n", m_glyphs.size());
 
     for (const auto& glyph: m_glyphs) {
-        fmt::print(f, "    0x{:08X}, 0x{:08X}, {:>6}, {:>6}, {:>6}, {:>6}, {:>6}, {:>6}\n",
+        fmt::print(f, "    0x{:08X}, 0x{:08X}, {:>6}, {:>6}, {:>6}, {:>6}, {:>6}, {:>6},\n",
                    glyph.codepoint, glyph.offset, glyph.x_bearing, glyph.y_bearing,
                    glyph.width, glyph.height, glyph.x_advance, glyph.y_advance);
     }
