@@ -53,7 +53,6 @@ typedef struct {
     uint16_t width;                     // width of glyph's bitmap
     uint16_t height;                    // height of glyph's bitmap
     int16_t x_advance;                  // distance to advance cursor horizontally after rendering glyph
-    int16_t y_advance;                  // distance to advance cursor vertically after rendering glyph
 } font2c_glyph_t;
 
 

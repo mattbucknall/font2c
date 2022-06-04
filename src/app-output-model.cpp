@@ -94,8 +94,7 @@ void OutputModel::add_glyph(const app::Glyph& glyph) {
             .y_bearing = static_cast<int16_t>(glyph.y_bearing()),
             .width = static_cast<uint16_t>(glyph.width()),
             .height = static_cast<uint16_t>(glyph.height()),
-            .x_advance = static_cast<int16_t>(glyph.x_advance()),
-            .y_advance = static_cast<int16_t>(glyph.y_advance())
+            .x_advance = static_cast<int16_t>(glyph.x_advance())
     };
 
     m_glyphs.push_back(f2c_glyph);
@@ -192,9 +191,9 @@ void OutputModel::write(std::string_view path, std::string_view font_path, const
     fmt::print(f, "static const font2c_glyph_t GLYPHS[{}] = {{\n", m_glyphs.size());
 
     for (const auto& glyph: m_glyphs) {
-        fmt::print(f, "    0x{:08X}, 0x{:08X}, {:>6}, {:>6}, {:>6}, {:>6}, {:>6}, {:>6},\n",
+        fmt::print(f, "    0x{:08X}, 0x{:08X}, {:>6}, {:>6}, {:>6}, {:>6}, {:>6},\n",
                    glyph.codepoint, glyph.offset, glyph.x_bearing, glyph.y_bearing,
-                   glyph.width, glyph.height, glyph.x_advance, glyph.y_advance);
+                   glyph.width, glyph.height, glyph.x_advance);
     }
 
     fmt::print(f, "}};\n\n\n");
