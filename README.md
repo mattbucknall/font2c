@@ -15,6 +15,7 @@ Convert font glyphs into bitmap images embeddable in C source code.
   -a, --antialiasing            Enable antialiasing
   -i, --no-hinting              Disable hinting
   -p, --preview=PATH            Preview output file path
+  -j, --center-adj=PIXELS       Number of pixels to adjust font center line by
 
 If no character set file is specified, a default character set consisting of
 ASCII codes 32-126 (inclusive) will be used.
@@ -22,6 +23,7 @@ ASCII codes 32-126 (inclusive) will be used.
 Supported raster types:
   lrtb        Scans left-to-right, top-to-bottom
 ```
+
 ## Supported font formats
 Anything supported by FreeType.
 
