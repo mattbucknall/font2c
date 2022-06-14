@@ -32,5 +32,6 @@ Options::Options():
         msb_first(false),
         antialiasing(true),
         no_hinting(false),
-        preview_path() {
+        preview_path(),
+        center_adjust(0) {
 }

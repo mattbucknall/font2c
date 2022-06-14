@@ -160,10 +160,11 @@ void OutputModel::write(std::string_view path, std::string_view font_path, const
     fmt::print(f, " * Pixel Depth:          {}bpp\n", options.pixel_depth);
     fmt::print(f, " * Raster Order:         {}\n", options.raster_type);
     fmt::print(f, " * Bit Order:            {}\n", options.msb_first ? "msb first" : "lsb first");
-    fmt::print(f, " * Antialiased:          {}\n", options.antialiasing ? "yes" : "no");
+    fmt::print(f, " * Anti-aliased:         {}\n", options.antialiasing ? "yes" : "no");
     fmt::print(f, " * Hinting:              {}\n", options.no_hinting ? "no" : "yes");
+    fmt::print(f, " * Center Adjustment:    {}\n", options.center_adjust);
     fmt::print(f, " * Glyph Count:          {}\n", m_glyphs.size());
-    fmt::print(f, " * Combined Table Size:  {} bytes\n", total_size);
+    fmt::print(f, " * Mem Usage (approx):   {} bytes\n", total_size);
     fmt::print(f, " */\n\n");
 
     fmt::print(f, "#include <font2c-types.h>\n\n\n");
@@ -204,6 +205,7 @@ void OutputModel::write(std::string_view path, std::string_view font_path, const
     fmt::print(f, "    .n_glyphs =     {},\n", m_glyphs.size());
     fmt::print(f, "    .ascent =       {},\n", m_line_ascent);
     fmt::print(f, "    .descent =      {},\n", m_line_descent);
+    fmt::print(f, "    .center =       {},\n", (m_line_ascent / 2) + options.center_adjust);
     fmt::print(f, "    .line_height =  {},\n", m_line_height);
     fmt::print(f, "    .compression =  FONT2C_COMPRESSION_NONE\n");
     fmt::print(f, "}};\n\n\n");

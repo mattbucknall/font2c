@@ -99,6 +99,8 @@ static void parse_args(int& argc, char** argv, app::Options& options) {
 
         p.option(options.preview_path, "PATH", 'p', "preview", "Preview output file path");
 
+        p.option(options.center_adjust, "PIXELS", 'j', "center-adj", "Number of pixels to adjust font center line by");
+
         p.parse(argc, argv);
 
         if (options.pixel_depth != 1 && options.pixel_depth != 2 && options.pixel_depth != 4 &&

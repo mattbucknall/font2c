@@ -5,16 +5,14 @@
  * 
  * Anyone is free to copy, modify, publish, use, compile, sell, or
  * distribute this software, either in source code form or as a compiled
- *         binary, for any purpose, commercial or non-commercial, and by any
- * means.
+ * binary, for any purpose, commercial or non-commercial, and by any means.
  * 
  * In jurisdictions that recognize copyright laws, the author or authors
- *         of this software dedicate any and all copyright interest in the
- * software to the public domain. We make this dedication for the benefit
- * of the public at large and to the detriment of our heirs and
- * successors. We intend this dedication to be an overt act of
- *         relinquishment in perpetuity of all present and future rights to this
- * software under copyright law.
+ * of this software dedicate any and all copyright interest in the software
+ * to the public domain. We make this dedication for the benefit of the
+ * public at large and to the detriment of our heirs and successors. We
+ * intend this dedication to be an overt act of relinquishment in perpetuity
+ * of all present and future rights to this software under copyright law.
  * 
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
  * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
@@ -22,7 +20,7 @@
  * IN NO EVENT SHALL THE AUTHORS BE LIABLE FOR ANY CLAIM, DAMAGES OR
  * OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE,
  * ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
- *         OTHER DEALINGS IN THE SOFTWARE.
+ * OTHER DEALINGS IN THE SOFTWARE.
  * 
  * For more information, please refer to <http://unlicense.org/>
  */
@@ -31,11 +29,12 @@
 #define _FONT2C_TYPES_H_
 
 #ifdef __cplusplus
-
+#include <cstddef>
 #include <cstdint>
 
 extern "C" {
 #else // __cplusplus
+#include <stddef.h>
 #include <stdint.h>
 #endif // __cplusplus
 
@@ -62,9 +61,35 @@ typedef struct {
     uint32_t n_glyphs;                  // number of glyphs in lookup table
     int16_t ascent;                     // font's longest ascender
     int16_t descent;                    // font's longest descender
+    int16_t center;                     // font's vertical center line
     int16_t line_height;                // minimum distance that should be left between lines
     font2c_compression_t compression;   // pixel data compression scheme
 } font2c_font_t;
+
+
+static inline const font2c_glyph_t* font2c_find_glyph(const font2c_font_t* font, uint32_t codepoint);
+
+
+#ifndef _DOXYGEN
+
+static inline const font2c_glyph_t* font2c_find_glyph(const font2c_font_t* font, uint32_t codepoint) {
+    const font2c_glyph_t* start = font->glyphs;
+    const font2c_glyph_t* end = start + font->n_glyphs;
+
+    while(start < end) {
+        const font2c_glyph_t* mid = start + (end - start) / 2;
+
+        if ( mid->codepoint < codepoint ) {
+            start = mid + 1;
+        } else {
+            end = mid;
+        }
+    }
+
+    return (start == end) ? start : NULL;
+}
+
+#endif // _DOXYGEN
 
 #ifdef __cplusplus
 };

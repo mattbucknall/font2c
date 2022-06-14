@@ -35,6 +35,7 @@ namespace app {
         bool antialiasing;
         bool no_hinting;
         std::string preview_path;
+        int center_adjust;
 
         Options();
     };
