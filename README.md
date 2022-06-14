@@ -17,11 +17,20 @@ Convert font glyphs into bitmap images embeddable in C source code.
   -p, --preview=PATH            Preview output file path
   -j, --center-adj=PIXELS       Number of pixels to adjust font center line by
 
-If no character set file is specified, a default character set consisting of
-ASCII codes 32-126 (inclusive) will be used.
+If no character set file is specified, a default character set consisting of ASCII
+codes 32-126 (inclusive) will be used. If a character set filename ends in .hex it will
+be interpreted as a line delimited list of hexadecimal codepoints, otherwise it must be
+a UTF-8 encoded text file containing the characters to use.
 
 Supported raster types:
-  lrtb        Scans left-to-right, top-to-bottom
+  btlr        Bottom-to-top, left-to-right
+  btrl        Bottom-to-top, right-to-left
+  lrbt        Left-to-right, bottom-to-top
+  lrtb        Left-to-right, top-to-bottom
+  rlbt        Right-to-left, bottom-to-top
+  rltb        Right-to-left, top-to-bottom
+  tblr        Top-to-bottom, left-to-right
+  tbrl        Top-to-bottom, right-to-left
 ```
 
 ## Supported font formats

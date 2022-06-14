@@ -43,29 +43,143 @@ struct Rasterizer {
 typedef std::map<std::string_view, Rasterizer> RasterizerMap;
 
 
+static uint8_t get_glyph_pixel(const app::Glyph& glyph, int x, int y) {
+    if (x < 0 || y < 0 || x >= glyph.width() || y >= glyph.height()) {
+        return 0;
+    } else {
+        const uint8_t* pixel = glyph.buffer();
+
+        pixel += (y * glyph.pitch());
+        pixel += x;
+
+        return *pixel;
+    }
+}
+
+
 static void lrtb_rasterizer(app::OutputModel& output_model, const app::Glyph& glyph) {
-    int pitch = glyph.pitch();
-    const uint8_t* row_i = glyph.buffer();
-    const uint8_t* row_e = row_i + (pitch * glyph.height());
+    int width = glyph.width();
+    int height = glyph.height();
 
-    while (row_i < row_e) {
-        const uint8_t* pixel_i = row_i;
-        const uint8_t* pixel_e = pixel_i + glyph.width();
-
-        while (pixel_i < pixel_e) {
-            output_model.add_pixel(*pixel_i);
-            pixel_i += 1;
+    for (int y = 0; y < height; y++) {
+        for (int x = 0; x < width; x++) {
+            output_model.add_pixel(get_glyph_pixel(glyph, x, y));
         }
 
         output_model.flush_pixels();
-        row_i += pitch;
+    }
+}
+
+
+static void rltb_rasterizer(app::OutputModel& output_model, const app::Glyph& glyph) {
+    int width = glyph.width();
+    int height = glyph.height();
+
+    for (int y = 0; y < height; y++) {
+        for (int x = width; x--;) {
+            output_model.add_pixel(get_glyph_pixel(glyph, x, y));
+        }
+
+        output_model.flush_pixels();
+    }
+}
+
+
+static void lrbt_rasterizer(app::OutputModel& output_model, const app::Glyph& glyph) {
+    int width = glyph.width();
+    int height = glyph.height();
+
+    for (int y = height; y--;) {
+        for (int x = 0; x < width; x++) {
+            output_model.add_pixel(get_glyph_pixel(glyph, x, y));
+        }
+
+        output_model.flush_pixels();
+    }
+}
+
+
+static void rlbt_rasterizer(app::OutputModel& output_model, const app::Glyph& glyph) {
+    int width = glyph.width();
+    int height = glyph.height();
+
+    for (int y = height; y--;) {
+        for (int x = width; x--;) {
+            output_model.add_pixel(get_glyph_pixel(glyph, x, y));
+        }
+
+        output_model.flush_pixels();
+    }
+}
+
+
+static void tblr_rasterizer(app::OutputModel& output_model, const app::Glyph& glyph) {
+    int width = glyph.width();
+    int height = glyph.height();
+
+    for (int x = 0; x < width; x++) {
+        for (int y = 0; y < height; y++) {
+            output_model.add_pixel(get_glyph_pixel(glyph, x, y));
+        }
+
+        output_model.flush_pixels();
+    }
+}
+
+
+static void tbrl_rasterizer(app::OutputModel& output_model, const app::Glyph& glyph) {
+    int width = glyph.width();
+    int height = glyph.height();
+
+
+    for (int x = width; x--;) {
+        for (int y = 0; y < height; y++) {
+            output_model.add_pixel(get_glyph_pixel(glyph, x, y));
+        }
+
+        output_model.flush_pixels();
+    }
+}
+
+
+static void btlr_rasterizer(app::OutputModel& output_model, const app::Glyph& glyph) {
+    int width = glyph.width();
+    int height = glyph.height();
+
+    for (int x = 0; x < width; x++) {
+        for (int y = height; y--;) {
+            output_model.add_pixel(get_glyph_pixel(glyph, x, y));
+        }
+
+        output_model.flush_pixels();
+    }
+}
+
+
+static void btrl_rasterizer(app::OutputModel& output_model, const app::Glyph& glyph) {
+    int width = glyph.width();
+    int height = glyph.height();
+
+    for (int x = width; x--;) {
+        for (int y = height; y--;) {
+            output_model.add_pixel(get_glyph_pixel(glyph, x, y));
+        }
+
+        output_model.flush_pixels();
     }
 }
 
 
 static const RasterizerMap& rasterizer_map() {
     static const RasterizerMap m = {
-            {"lrtb",    {"Scans left-to-right, top-to-bottom",          lrtb_rasterizer}}
+            {"lrtb", {"Left-to-right, top-to-bottom", lrtb_rasterizer}},
+            {"rltb", {"Right-to-left, top-to-bottom", rltb_rasterizer}},
+            {"lrbt", {"Left-to-right, bottom-to-top", lrbt_rasterizer}},
+            {"rlbt", {"Right-to-left, bottom-to-top", rlbt_rasterizer}},
+            {"tblr", {"Top-to-bottom, left-to-right", tblr_rasterizer}},
+            {"tbrl", {"Top-to-bottom, right-to-left", tbrl_rasterizer}},
+            {"btlr", {"Bottom-to-top, left-to-right", btlr_rasterizer}},
+            {"btrl", {"Bottom-to-top, right-to-left", btrl_rasterizer}}
     };
 
     return m;
@@ -75,8 +189,10 @@ static const RasterizerMap& rasterizer_map() {
 static void parse_args(int& argc, char** argv, app::Options& options) {
     app::ArgParser p("[FONT PATH] [OUTPUT PATH]",
                      "Convert font glyphs into bitmap images embeddable in C source code.",
-                     "If no character set file is specified, a default character set consisting of\n"
-                     "ASCII codes 32-126 (inclusive) will be used.");
+                     "If no character set file is specified, a default character set consisting of ASCII\n"
+                     "codes 32-126 (inclusive) will be used. If a character set filename ends in .hex it will\n"
+                     "be interpreted as a line delimited list of hexadecimal codepoints, otherwise it must be\n"
+                     "a UTF-8 encoded text file containing the characters to use.");
 
     try {
         p.option(options.size, "PIXELS", 's', "size", fmt::format("Font size (default = {})", options.size));
@@ -175,7 +291,7 @@ int main(int argc, char* argv[]) {
 
         if (!options.preview_path.empty()) {
             app::preview_generate(options.preview_path, font, char_set, options.pixel_depth, options.antialiasing,
-                                           options.no_hinting);
+                                  options.no_hinting);
         }
 
         exit_code = EXIT_SUCCESS;
