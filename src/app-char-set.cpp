@@ -18,7 +18,9 @@
  * IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
 
+#include <filesystem>
 #include <fstream>
+#include <sstream>
 
 #include "app-char-set.hpp"
 
@@ -44,7 +46,7 @@ static void expect_input(CharSetFileInput& i, CharSetFileInput& e) {
 }
 
 
-app::CharSet app::char_set_load(std::string_view path) {
+static app::CharSet load_txt(std::string_view path) {
     static const uint8_t LENGTH_LUT[] = {
             1, 1, 1, 1, 1, 1, 1, 1,
             1, 1, 1, 1, 1, 1, 1, 1,
@@ -66,7 +68,7 @@ app::CharSet app::char_set_load(std::string_view path) {
 
     CharSetFileInput input_i(ifs);
     CharSetFileInput input_e;
-    CharSet s;
+    app::CharSet s;
 
     if (!ifs) {
         throw app::Error("Unable to load character set '{}'", path);
@@ -100,4 +102,37 @@ app::CharSet app::char_set_load(std::string_view path) {
     }
 
     return s;
+}
+
+
+static app::CharSet load_hex(std::string_view path) {
+    std::ifstream ifs(path.data());
+    app::CharSet s;
+    std::string line;
+
+    if (!ifs) {
+        throw app::Error("Unable to load character set '{}'", path);
+    }
+
+    while (std::getline(ifs, line)) {
+        try {
+            s.insert(stoul(line, nullptr, 16));
+        } catch(std::out_of_range&) {
+            // ignore
+        } catch(std::invalid_argument&) {
+            // ignore
+        }
+    }
+
+    return s;
+}
+
+
+
+app::CharSet app::char_set_load(std::string_view path) {
+    if ( std::filesystem::path(path).extension() == ".hex" ) {
+        return load_hex(path);
+    } else {
+        return load_txt(path);
+    }
 }

@@ -95,8 +95,8 @@ Glyph::Glyph(Font& font, char32_t codepoint, bool anti_aliased, bool no_hinting)
 
         m_x_bearing = static_cast<int>(glyph->bitmap_left);
         m_y_bearing = static_cast<int>(glyph->bitmap_top - 1);
-        m_x_advance = static_cast<int>(glyph->advance.x / 64);
-        m_y_advance = static_cast<int>(glyph->advance.y / 64);
+        m_x_advance = static_cast<int>((glyph->advance.x + 32) / 64);
+        m_y_advance = static_cast<int>((glyph->advance.y + 32) / 64);
     } catch(app::Error& e) {
         e.prefix("Codepoint U+{:04X}", static_cast<uint32_t>(codepoint));
         throw;
