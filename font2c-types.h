@@ -73,20 +73,28 @@ static inline const font2c_glyph_t* font2c_find_glyph(const font2c_font_t* font,
 #ifndef _DOXYGEN
 
 static inline const font2c_glyph_t* font2c_find_glyph(const font2c_font_t* font, uint32_t codepoint) {
-    const font2c_glyph_t* start = font->glyphs;
-    const font2c_glyph_t* end = start + font->n_glyphs;
+    const font2c_glyph_t* glyphs = font->glyphs;
+    int32_t l = 0;
+    int32_t r = (int32_t) (font->n_glyphs - 1);
 
-    while(start < end) {
-        const font2c_glyph_t* mid = start + (end - start) / 2;
+    while (l <= r) {
+        int32_t m = (l + r) / 2;
+        uint32_t glyph_codepoint = glyphs[m].codepoint;
 
-        if ( mid->codepoint < codepoint ) {
-            start = mid + 1;
+        if ( glyph_codepoint < codepoint ) {
+            l = m + 1;
+        } else if ( glyph_codepoint > codepoint ) {
+            r = m - 1;
         } else {
-            end = mid;
+            if ( m >= font->n_glyphs ) {
+                return NULL;
+            } else {
+                return &glyphs[m];
+            }
         }
     }
 
-    return (start == end) ? start : NULL;
+    return NULL;
 }
 
 #endif // _DOXYGEN

@@ -21,6 +21,7 @@
 #include <filesystem>
 #include <fstream>
 #include <sstream>
+#include <string>
 
 #include "app-char-set.hpp"
 
@@ -116,7 +117,13 @@ static app::CharSet load_hex(std::string_view path) {
 
     while (std::getline(ifs, line)) {
         try {
-            s.insert(stoul(line, nullptr, 16));
+            auto comment_pos = line.find('#');
+
+            if ( comment_pos != std::string::npos ) {
+                line.resize(comment_pos);
+            }
+
+            s.insert(std::stoul(line, nullptr, 16));
         } catch(std::out_of_range&) {
             // ignore
         } catch(std::invalid_argument&) {

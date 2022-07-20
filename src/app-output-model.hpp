@@ -38,7 +38,7 @@ namespace app {
 
         typedef std::function<void (app::OutputModel& output_model, const app::Glyph& glyph)> RasterizerFunc;
 
-        OutputModel(int depth, bool msb_first, RasterizerFunc rasterizer_func);
+        OutputModel(int depth, bool msb_first, RasterizerFunc rasterizer_func, std::string_view cmd_line = std::string());
 
         [[nodiscard]]
         int line_ascent() const;
@@ -66,7 +66,8 @@ namespace app {
 
     private:
 
-        RasterizerFunc m_rasterizer_func;
+        const RasterizerFunc m_rasterizer_func;
+        const std::string m_cmd_line;
         int m_shift;
         int m_start;
         int m_delta;

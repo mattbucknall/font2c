@@ -20,6 +20,7 @@
 
 #include <algorithm>
 #include <map>
+#include <sstream>
 
 #include <fmt/core.h>
 
@@ -245,8 +246,28 @@ static void parse_args(int& argc, char** argv, app::Options& options) {
 }
 
 
+static std::string reconstruct_command_line(int argc, char* argv[]) {
+    std::string cmd_line;
+
+    for (int i = 0; i < argc; i++) {
+        std::string_view arg = argv[i];
+
+        // TODO: Correctly represent arguments containing spaces
+
+        if ( i > 0 ) {
+            cmd_line += ' ';
+        }
+
+        cmd_line += arg;
+    }
+
+    return cmd_line;
+}
+
+
 int main(int argc, char* argv[]) {
     int exit_code = EXIT_FAILURE;
+    const std::string cmd_line = reconstruct_command_line(argc, argv);
 
     try {
         app::Options options;
@@ -276,7 +297,7 @@ int main(int argc, char* argv[]) {
         }
 
         app::Font font(argv[1], options.size);
-        app::OutputModel output_model(options.pixel_depth, options.msb_first, ri->second.func);
+        app::OutputModel output_model(options.pixel_depth, options.msb_first, ri->second.func, cmd_line);
 
         for (auto codepoint: char_set) {
             try {
