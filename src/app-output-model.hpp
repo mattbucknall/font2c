@@ -63,6 +63,7 @@ namespace app {
 
         void write(std::string_view path, std::string_view font_path, const app::Options& options) const;
 
+        void write_java_metadata(std::string_view path, std::string_view font_path, const app::Options& options) const;
 
     private:
 

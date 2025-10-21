@@ -20,49 +20,28 @@
 
 #pragma once
 
-#include <memory>
+#include <cstdint>
+#include <vector>
 
-#include "app-bitmap.hpp"
-#include "app-error.hpp"
-#include "app-font.hpp"
-#include "app-ft-lib.hpp"
+extern "C" {
+#include <ft2build.h>
+#include FT_FREETYPE_H
+#include FT_BITMAP_H
+}
 
 
 namespace app {
 
-    class GlyphError final: public app::Error {
+    class Bitmap final {
     public:
 
-        using app::Error::Error;
-
-        ~GlyphError() noexcept override;
-    };
-
-
-    class Glyph final {
-    public:
-
-        Glyph(Font& font, char32_t codepoint, bool anti_aliased, bool no_hinting = false,
-                bool pseudo_bold = false);
-
-        Glyph(const Glyph&) = delete;
-
-        Glyph& operator= (const Glyph&) = delete;
+        explicit Bitmap(const FT_Bitmap& bitmap);
 
         [[nodiscard]]
-        char32_t codepoint() const noexcept;
+        std::uint8_t* pixels() noexcept;
 
         [[nodiscard]]
-        int x_bearing() const noexcept;
-
-        [[nodiscard]]
-        int y_bearing() const noexcept;
-
-        [[nodiscard]]
-        int x_advance() const noexcept;
-
-        [[nodiscard]]
-        int y_advance() const noexcept;
+        const std::uint8_t* pixels() const noexcept;
 
         [[nodiscard]]
         unsigned int width() const noexcept;
@@ -70,20 +49,16 @@ namespace app {
         [[nodiscard]]
         unsigned int height() const noexcept;
 
-        [[nodiscard]]
-        const uint8_t* buffer() const noexcept;
+        void make_mono(std::uint8_t threshold = 1);
 
-        [[nodiscard]]
-        unsigned pitch() const noexcept;
+        void increase_weight();
 
     private:
 
-        char32_t m_codepoint;
-        int m_x_bearing;
-        int m_y_bearing;
-        int m_x_advance;
-        int m_y_advance;
-        std::shared_ptr<app::Bitmap> m_bitmap;
+        unsigned int m_width;
+        unsigned int m_height;
+        std::vector<std::uint8_t> m_pixels;
     };
 
 }
+

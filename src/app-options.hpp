@@ -30,12 +30,15 @@ namespace app {
         std::string raster_type;
         std::string char_set_path;
         std::string symbol_name;
+        std::string java_path;
         int pixel_depth;
         bool msb_first;
         bool antialiasing;
         bool no_hinting;
         std::string preview_path;
         int center_adjust;
+        int kerning_offset;
+        bool pseudo_bold;
 
         Options();
     };

@@ -143,7 +143,7 @@ std::optional<font2c_glyph_t> Canvas::draw_glyph(int x, int y, const app::Output
         src_x = r.x1 - src_x;
         src_y = r.y1 - src_y;
 
-        const uint8_t* src_bitmap = output_model.pixel_data().data() + glyph->offset;
+        const uint8_t* src_bitmap = glyph->bitmap;
         const uint8_t* src_row_i = src_bitmap + (glyph->width * src_y);
 
         while(row_i < row_e) {

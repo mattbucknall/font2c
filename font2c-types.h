@@ -46,7 +46,7 @@ typedef enum {
 
 typedef struct {
     uint32_t codepoint;                 // glyph's unicode codepoint
-    uint32_t offset;                    // offset of first bitmap byte in pixel table
+    const uint8_t* bitmap;              // Pointer to first bitmap byte in pixel table
     int16_t x_bearing;                  // horizontal offset of glyph bitmap's top-left corner relative to its origin
     int16_t y_bearing;                  // vertical offset of glyph's bitmap's top-left corner relative to its origin
     uint16_t width;                     // width of glyph's bitmap
@@ -56,7 +56,6 @@ typedef struct {
 
 
 typedef struct {
-    const uint8_t* pixels;              // pointer to font's bitmap data
     const font2c_glyph_t* glyphs;       // pointer to font's glyph lookup table
     uint32_t n_glyphs;                  // number of glyphs in lookup table
     int16_t ascent;                     // font's longest ascender
@@ -70,7 +69,7 @@ typedef struct {
 static inline const font2c_glyph_t* font2c_find_glyph(const font2c_font_t* font, uint32_t codepoint);
 
 
-#ifndef _DOXYGEN
+/// @cond private
 
 static inline const font2c_glyph_t* font2c_find_glyph(const font2c_font_t* font, uint32_t codepoint) {
     const font2c_glyph_t* glyphs = font->glyphs;
@@ -97,7 +96,7 @@ static inline const font2c_glyph_t* font2c_find_glyph(const font2c_font_t* font,
     return NULL;
 }
 
-#endif // _DOXYGEN
+/// @endcond
 
 #ifdef __cplusplus
 };

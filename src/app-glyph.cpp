@@ -18,6 +18,7 @@
  * IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
 
+#include "app-ft-lib.hpp"
 #include "app-glyph.hpp"
 
 using namespace app;
@@ -26,9 +27,8 @@ using namespace app;
 GlyphError::~GlyphError() noexcept = default;
 
 
-Glyph::Glyph(Font& font, char32_t codepoint, bool anti_aliased, bool no_hinting):
-    m_codepoint(codepoint),
-    m_lib(app::FtLib::singleton()) {
+Glyph::Glyph(Font& font, char32_t codepoint, bool anti_aliased, bool no_hinting, bool pseudo_bold):
+    m_codepoint(codepoint) {
     FT_Error err;
     FT_Int32 load_flags;
     FT_Render_Mode render_mode;
@@ -40,6 +40,10 @@ Glyph::Glyph(Font& font, char32_t codepoint, bool anti_aliased, bool no_hinting)
 
         if (no_hinting) {
             load_flags |= FT_LOAD_NO_HINTING;
+        }
+
+        if ( pseudo_bold ) {
+            anti_aliased = false;
         }
 
         if (anti_aliased) {
@@ -69,43 +73,39 @@ Glyph::Glyph(Font& font, char32_t codepoint, bool anti_aliased, bool no_hinting)
             throw app::GlyphError("Unable to render glyph for this codepoint");
         }
 
-        FT_Bitmap_Init(&m_bitmap);
-        err = FT_Bitmap_Convert(m_lib, &glyph->bitmap, &m_bitmap, 1);
+        FT_Bitmap bitmap;
+        FT_Bitmap_Init(&bitmap);
 
-        if ( err ) {
-            throw app::GlyphError("Unable to normalize pixel depth for this codepoint");
+        try {
+            err = FT_Bitmap_Convert(app::FtLib::singleton(), &glyph->bitmap, &bitmap, 1);
+
+            if ( err ) {
+                throw app::GlyphError("Unable to normalize pixel depth for this codepoint");
+            }
+
+            m_bitmap = std::make_shared<app::Bitmap>(bitmap);
+        } catch (...) {
+            FT_Bitmap_Done(app::FtLib::singleton(), &bitmap);
+            throw;
         }
 
         if ( render_mode == FT_RENDER_MODE_MONO ) {
-            uint8_t* row_i = m_bitmap.buffer;
-            uint8_t* row_e = row_i + (m_bitmap.pitch * m_bitmap.rows);
-
-            while(row_i < row_e) {
-                uint8_t* pixel_i = row_i;
-                uint8_t* pixel_e = pixel_i + m_bitmap.width;
-
-                while(pixel_i < pixel_e) {
-                    *pixel_i = (*pixel_i > 0) ? 0xFF : 0x00;
-                    pixel_i++;
-                }
-
-                row_i += m_bitmap.pitch;
-            }
+            m_bitmap->make_mono();
         }
 
-        m_x_bearing = static_cast<int>(glyph->bitmap_left);
-        m_y_bearing = static_cast<int>(glyph->bitmap_top - 1);
+        m_x_bearing = glyph->bitmap_left;
+        m_y_bearing = glyph->bitmap_top - 1;
         m_x_advance = static_cast<int>((glyph->advance.x + 32) / 64);
         m_y_advance = static_cast<int>((glyph->advance.y + 32) / 64);
+
+        if ( pseudo_bold ) {
+            m_bitmap->increase_weight();
+            m_x_advance += 1;
+        }
     } catch(app::Error& e) {
         e.prefix("Codepoint U+{:04X}", static_cast<uint32_t>(codepoint));
         throw;
     }
-}
-
-
-Glyph::~Glyph() noexcept {
-    FT_Bitmap_Done(m_lib, &m_bitmap);
 }
 
 
@@ -134,21 +134,21 @@ int Glyph::y_advance() const noexcept {
 }
 
 
-int Glyph::width() const noexcept {
-    return static_cast<int>(m_bitmap.width);
+unsigned int Glyph::width() const noexcept {
+    return m_bitmap->width();
 }
 
 
-int Glyph::height() const noexcept {
-    return static_cast<int>(m_bitmap.rows);
+unsigned int Glyph::height() const noexcept {
+    return m_bitmap->height();
 }
 
 
 const uint8_t* Glyph::buffer() const noexcept {
-    return m_bitmap.buffer;
+    return m_bitmap->pixels();
 }
 
 
-int Glyph::pitch() const noexcept {
-    return m_bitmap.pitch;
+unsigned int Glyph::pitch() const noexcept {
+    return m_bitmap->width();
 }

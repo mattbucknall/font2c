@@ -205,6 +205,8 @@ static void parse_args(int& argc, char** argv, app::Options& options) {
 
         p.option(options.symbol_name, "NAME", 'y', "symbol", "Symbol name for font2c_face_t object");
 
+        p.option(options.java_path, "PATH", 'j', "java-metadata", "Path to output font metadata in Java format");
+
         p.option(options.pixel_depth, "BPP", 'd', "depth",
                  fmt::format("Pixel depth (must be 1, 2, 4 or 8, default = {})", options.pixel_depth));
 
@@ -216,7 +218,11 @@ static void parse_args(int& argc, char** argv, app::Options& options) {
 
         p.option(options.preview_path, "PATH", 'p', "preview", "Preview output file path");
 
-        p.option(options.center_adjust, "PIXELS", 'j', "center-adj", "Number of pixels to adjust font center line by");
+        p.option(options.center_adjust, "PIXELS", 't', "center-adj", "Number of pixels to adjust font center line by");
+
+        p.option(options.kerning_offset, 'k', "Offset to add to kerning");
+
+        p.option(options.pseudo_bold, 'b', "pseudo-bold", "Increase font weight by overlapping two copies of each glyph with 1-pixel offset");
 
         p.parse(argc, argv);
 
@@ -301,7 +307,7 @@ int main(int argc, char* argv[]) {
 
         for (auto codepoint: char_set) {
             try {
-                app::Glyph glyph(font, codepoint, options.antialiasing, options.no_hinting);
+                app::Glyph glyph(font, codepoint, options.antialiasing, options.no_hinting, options.pseudo_bold);
                 output_model.add_glyph(glyph);
             } catch (app::GlyphError& e) {
                 fmt::print(stderr, "Warning: {}\n", e.what());
@@ -309,6 +315,10 @@ int main(int argc, char* argv[]) {
         }
 
         output_model.write(argv[2], argv[1], options);
+
+        if ( !options.java_path.empty() ) {
+            output_model.write_java_metadata(options.java_path, argv[1], options);
+        }
 
         if (!options.preview_path.empty()) {
             app::preview_generate(options.preview_path, font, char_set, options.pixel_depth, options.antialiasing,

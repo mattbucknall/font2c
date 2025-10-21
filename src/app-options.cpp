@@ -33,5 +33,7 @@ Options::Options():
         antialiasing(true),
         no_hinting(false),
         preview_path(),
-        center_adjust(0) {
+        center_adjust(0),
+        kerning_offset(0),
+        pseudo_bold(false) {
 }

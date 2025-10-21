@@ -1,5 +1,6 @@
 add_executable(font2c
         app-arg-parser.cpp
+        app-bitmap.cpp
         app-canvas.cpp
         app-char-set.cpp
         app-error.cpp
