@@ -20,4 +20,4 @@
 
 #pragma once
 
-#define APP_VERSION_STR     "0.0.2-beta"
+#define APP_VERSION_STR     "0.1.0"
