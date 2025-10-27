@@ -282,8 +282,8 @@ void OutputModel::write_java_metadata(std::string_view path, std::string_view fo
         const auto separator = (next == glyph_e) ? "" : ",";
         const auto& glyph = *glyph_i;
 
-        fmt::print(f, "        Map.entry(0x{:08X}, new Glyph({:>6}, {:>6}, {:>6}, {:>6}, {:>6})){}\n",
-                glyph.codepoint, glyph.x_bearing, glyph.y_bearing,
+        fmt::print(f, "        Map.entry(0x{:08X}, new Glyph(0x{:08X}, {:>6}, {:>6}, {:>6}, {:>6}, {:>6})){}\n",
+                glyph.codepoint, glyph.codepoint, glyph.x_bearing, glyph.y_bearing,
                glyph.width, glyph.height, glyph.x_advance + options.kerning_offset, separator);
 
         glyph_i = next;
