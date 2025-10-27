@@ -220,9 +220,9 @@ static void parse_args(int& argc, char** argv, app::Options& options) {
 
         p.option(options.center_adjust, "PIXELS", 't', "center-adj", "Number of pixels to adjust font center line by");
 
-        p.option(options.kerning_offset, 'k', "Offset to add to kerning");
+        p.option(options.kerning_offset, 'k', "kerning", "Offset to add to kerning");
 
-        p.option(options.pseudo_bold, 'b', "pseudo-bold", "Increase font weight by overlapping two copies of each glyph with 1-pixel offset");
+        p.option(options.pseudo_bold, 'b', "pseudo-bold", "Increase weight by overlapping two offset copies of each glyph");
 
         p.parse(argc, argv);
 

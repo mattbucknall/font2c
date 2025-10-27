@@ -10,12 +10,15 @@ Convert font glyphs into bitmap images embeddable in C source code.
   -r, --raster-type=TYPE        Rasterization type (default = lrtb)
   -c, --char-set=PATH           Path to character set file
   -y, --symbol=NAME             Symbol name for font2c_face_t object
+  -j, --java-metadata=PATH      Path to output font metadata in Java format
   -d, --depth=BPP               Pixel depth (must be 1, 2, 4 or 8, default = 8)
   -m, --msb-first               Pack most-significant bits first
   -a, --antialiasing            Enable antialiasing
   -i, --no-hinting              Disable hinting
   -p, --preview=PATH            Preview output file path
-  -j, --center-adj=PIXELS       Number of pixels to adjust font center line by
+  -t, --center-adj=PIXELS       Number of pixels to adjust font center line by
+  -k, --kerning                 Offset to add to kerning
+  -b, --pseudo-bold             Increase weight by overlapping two offset copies of each glyph
 
 If no character set file is specified, a default character set consisting of ASCII
 codes 32-126 (inclusive) will be used. If a character set filename ends in .hex it will
